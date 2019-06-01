@@ -60,45 +60,6 @@
                     <button class="modal-close is-large" aria-label="close" onclick="@CloseModal"></button>
                 </div>
 
-
-                <div class="modal @(isEditModalActive ? "is-active" : "" )">
-                    <div class="modal-background" onclick="@CloseEditModal"></div>
-                    <div class="modal-content">
-                        <div class="card">
-                            <header class="card-header">
-                                <p class="card-header-title">
-                                    Edit Project
-                                </p>
-                                <a href="#" class="card-header-icon" aria-label="more options">
-                                    <span class="icon">
-                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                    </span>
-                                </a>
-                            </header>
-                            <div class="card-content">
-                                <EditForm Model="@editProjectForm" OnValidSubmit="@EditProjectForm">
-                                    <DataAnnotationsValidator />
-                                    <ValidationSummary />
-                                    <div class="field">
-                                        <label class="label">Name</label>
-                                        <div class="control">
-                                            <InputText id="name"  class="input" bind-Value="@editProjectForm.Name" />
-                                        </div>
-                                    </div>
-                                    <div class="field">
-                                        <label class="label">Description</label>
-                                        <div class="control">
-                                            <InputText id="description" class="input" bind-Value="@editProjectForm.Description" />
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="button is-link">Edit</button>
-                                </EditForm>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="modal-close is-large" aria-label="close" onclick="@CloseEditModal"></button>
-                </div>
-
                 @if (projects == null)
                 {
                     <p><em>Loading...</em></p>
@@ -131,7 +92,7 @@
                                     </div>
                                     <footer class="card-footer">
                                         <a href="/project/@project.Id" class="card-footer-item">Goto</a>
-                                        <a class="card-footer-item btn btn-link" onclick="@(async () => await FillEditProjectForm(project.Id))">Edit</a>
+                                        <a href="#" class="card-footer-item">Edit</a>
                                         <a href="#" class="card-footer-item">Delete</a>
                                     </footer>
                                 </div>
@@ -148,10 +109,8 @@
 
     List<ProjectDto> projects;
     bool isModalActive;
-    bool isEditModalActive;
     ProjectModel projectForm = new ProjectModel();
-    ProjectModel editProjectForm = new ProjectModel();
-    long editProjectId;
+
     protected override async Task OnInitAsync()
     {
         try
@@ -169,8 +128,6 @@
 
     private void CloseModal() => isModalActive = false;
 
-    private void ShowEditModal() => isEditModalActive = true;
-    private void CloseEditModal() => isEditModalActive = false;
     private async Task SubmitProjectForm()
     {
         var newProject = await _projectService.AddProject(projectForm);
@@ -178,19 +135,7 @@
         projectForm = new ProjectModel();
         CloseModal();
     }
-    private async Task FillEditProjectForm(long id)
-    {
-        var project = await _projectService.GetProject(id);
-        editProjectId = id;
-        editProjectForm = new ProjectModel() { Name = project.Name, Description = project.Description };
-        ShowEditModal();
-    }
-    private async Task EditProjectForm()
-    {
-        await _projectService.EditProject(editProjectId, editProjectForm);
-        CloseEditModal();
-        await OnInitAsync();
-    }
+
     private string GetShortDescription(string description)
     {
         int descrioptionLimit = 10;
