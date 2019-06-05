@@ -50,5 +50,11 @@ namespace TestHouse.Web.Blazor.Services
             var result = await response.Content.ReadAsStringAsync();
             return Json.Deserialize<ProjectDto>(result);
         }
+
+        public async Task EditProject(long projectId, ProjectModel model)
+        {
+            var content = new StringContent(Json.Serialize(model), Encoding.UTF8, "application/json");
+            await _httpClient.PatchAsync($"http://localhost:5000/api/project/{projectId}", content);           
+        }
     }
 }
